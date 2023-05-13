@@ -1,15 +1,27 @@
-import os
 from convasation_analyze_chain import ConvasationAnalyserChain
-from convasation_analyze_chain import ConversationAnalyzer
-from langchain.chat_models import ChatOpenAI, ChatAnthropic
+from analyzer.conversation_analyze import ConversationAnalyzer
+from langchain.llms.fake import FakeListLLM
 
 
 def Demo():
-    chat = ChatOpenAI()
+    responses = [
+        """
+        >>>[用户1]>>>[用户1是一个好人]|||
+        >>>[用户2]>>>[用户2是一个坏人]|||
+        """,
+        "总结=用户1是一个好人",
+        "总结=用户1是一个大好人",
+        "总结=用户2是一个好人",
+        "总结=用户2是一个大好人",
+        "summarizes",
+    ]
+    chat = FakeListLLM(responses=responses)
 
-    analyzer = ConversationAnalyzer(chat=chat)
+    analyzer = ConversationAnalyzer(chat=chat, max_message_length=1000)
 
-    analyzser_chain = ConvasationAnalyserChain(analyzer=analyzer)
+    analyzser_chain = ConvasationAnalyserChain(
+        conversation_analyzer=analyzer, verbose=True
+    )
 
     analyzser_chain_resp = {}
     with open("demo.txt", "r", encoding="utf-8") as file:
@@ -24,5 +36,4 @@ def Demo():
     print(analyze_list)
 
 
-if "OPENAI_API_KEY" in os.environ:
-    Demo()
+Demo()
